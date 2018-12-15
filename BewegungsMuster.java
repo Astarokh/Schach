@@ -14,14 +14,14 @@ public class BewegungsMuster {
 	
 	
 	
-	public static boolean spielzugUeberpruefung(Figur figur, int[] startFeld, int[] zielFeld, Spielbrett spielbrett, int team) {
+	public static boolean spielzugUeberpruefung(Figur figur, int[] startFeld, int[] zielFeld, Spielbrett spielbrett, int team, Figur[] schachFigurenSet) {
 		
 		boolean spielzugZulaessig = false;
 		
 		switch (figur.getBewegungsmuster()) {
 		
 			case 1: 
-				spielzugZulaessig = bewegungBauer(figur, startFeld, zielFeld, spielbrett, team);
+				spielzugZulaessig = bewegungBauer(figur, startFeld, zielFeld, spielbrett, team, schachFigurenSet);
 				break;
 			
 			case 2:
@@ -37,27 +37,29 @@ public class BewegungsMuster {
 				spielzugZulaessig = bewegungDame(figur, startFeld, zielFeld, spielbrett, team);
 				break;
 			case 6:
-				spielzugZulaessig = bewegungKoenig(figur, startFeld, zielFeld, spielbrett, team);
+				spielzugZulaessig = bewegungKoenig(figur, startFeld, zielFeld, spielbrett, team, schachFigurenSet);
 				break;
 				
 		}		
 		return spielzugZulaessig;
 	}
 	
-	public static boolean bewegungBauer(Figur figur, int[] startFeld, int[] zielFeld, Spielbrett spielbrett, int team) {			//nur geradeaus, max. 1 Feld ACHTUNG: DIAGONALES SCHLAGEN VON FIGUREN fehlt noch!!!!
+	public static boolean bewegungBauer(Figur figur, int[] startFeld, int[] zielFeld, Spielbrett spielbrett, int team, Figur[] schachFigurenSet) {			//nur geradeaus, max. 1 Feld ACHTUNG: DIAGONALES SCHLAGEN VON FIGUREN fehlt noch!!!!
 		
 		boolean spielzugZulaessig = false;
 		Scanner input = new Scanner(System.in);
-		
+		//Abfrage, zu welchem Team der Bauer gehört
 		if (figur.getFigurID() >= 16 
 		 && figur.getFigurID() < 24) {
-			
+
+			//2 Felder möglich, wenn der Bauer in Startposition steht, ansonsten 1 Feld
+
 			if(startFeld[1] == 1) {
 				if (((startFeld[0] == zielFeld[0]) 
 						 && (startFeld[1] == (zielFeld[1]-1))
 					||((startFeld[0] == zielFeld[0]) 
 							 && (startFeld[1] == (zielFeld[1]-2))))
-							 &&(!(Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1]+1, zielFeld[0], spielbrett).getFigur().isAktiv()))				//Kollisionsabfrage!
+							 &&(!(Spielfeld.spielfeldNachKoordinatenSuchen((zielFeld[1]+1), zielFeld[0], spielbrett).getFigur().isAktiv()))				//Kollisionsabfrage!
 							 &&(!(Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1], zielFeld[0], spielbrett).getFigur().isAktiv()))) {				//Kollisionsabfrage!
 							spielzugZulaessig = true;
 						}
@@ -70,20 +72,24 @@ public class BewegungsMuster {
 					spielzugZulaessig = true;
 				}
 			}
-			if (((Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1], zielFeld[0], spielbrett).getFigur().isAktiv()) && ((startFeld[0] == zielFeld[0]+1) && (startFeld[1] == (zielFeld[1]+1)))) 
-					|| ((Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1], zielFeld[0], spielbrett).getFigur().isAktiv()) && ((startFeld[0] == zielFeld[0]-1) && (startFeld[1] == (zielFeld[1]+1))))) {
+			//wenn diagonal vor dem Bauern eine Figur steht, darf er schlagen
+			if (((Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1], zielFeld[0], spielbrett).getFigur().isAktiv()) && ((startFeld[0] == zielFeld[0]+1) && (startFeld[1] == (zielFeld[1]-1))))
+					|| ((Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1], zielFeld[0], spielbrett).getFigur().isAktiv()) && ((startFeld[0] == zielFeld[0]-1) && (startFeld[1] == (zielFeld[1]-1))))) {
 				spielzugZulaessig = true;
 			}
 		}
+		//Abfrage, zu welchem Team der Bauer gehört
 		else if (figur.getFigurID() >= 0 
 			  && figur.getFigurID() < 8) {
-			
+
+			//2 Felder möglich, wenn der Bauer in Startposition steht, ansonsten 1 Feld
+
 			if(startFeld[1] == 6) {
 				if (((startFeld[0] == zielFeld[0]) 
 						 && (startFeld[1] == (zielFeld[1]+1))
 					||((startFeld[0] == zielFeld[0]) 
 							 && (startFeld[1] == (zielFeld[1]+2))))
-							 &&(!(Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1]-1, zielFeld[0], spielbrett).getFigur().isAktiv()))				//Kollisionsabfrage!
+							 &&(!(Spielfeld.spielfeldNachKoordinatenSuchen((zielFeld[1]-1), zielFeld[0], spielbrett).getFigur().isAktiv()))				//Kollisionsabfrage!
 							 &&(!(Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1], zielFeld[0], spielbrett).getFigur().isAktiv()))) {				//Kollisionsabfrage!
 							spielzugZulaessig = true;
 				}
@@ -95,95 +101,134 @@ public class BewegungsMuster {
 					spielzugZulaessig = true;
 				}				
 			}
-			if (((Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1], zielFeld[0], spielbrett).getFigur().isAktiv()) && ((startFeld[0] == zielFeld[0]+1) && (startFeld[1] == (zielFeld[1]+1)))) 
+			//wenn diagonal vor dem Bauern eine Figur steht, darf er schlagen
+			if (((Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1], zielFeld[0], spielbrett).getFigur().isAktiv()) && ((startFeld[0] == zielFeld[0]+1) && (startFeld[1] == (zielFeld[1]+1))))
 					|| ((Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1], zielFeld[0], spielbrett).getFigur().isAktiv()) && ((startFeld[0] == zielFeld[0]-1) && (startFeld[1] == (zielFeld[1]+1))))) {
 				spielzugZulaessig = true;
 			}
 		}
-
+		//Pruefung ob die Figur die geschlagen werden soll eine eigene ist
 		if (Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1], zielFeld[0], spielbrett).getFigur().getTeam() == team) {
 			System.out.println("Sie duerfen keine eigene Figur schlagen!");
 			spielzugZulaessig = false;
 		}
 
-		//Bauer zu einer gewaehlten Figur tauschen, wenn er die letzte Reihe erreicht
-		int gewaehlteFigur = 1;
+		//en passant:
+
+		if ((team == 1) && (startFeld[1] == 3)
+				&& (Spielfeld.spielfeldNachKoordinatenSuchen((zielFeld[1]+1), zielFeld[0], spielbrett).getFigur().getTeam() == 2)					// Spielfigur auf dem Feld ist im gegnerischen Team
+				&& (Spielfeld.spielfeldNachKoordinatenSuchen((zielFeld[1]+1), zielFeld[0], spielbrett).getFigur().getBewegungsmuster() == 1)		// Spielfigur ist ein Bauer
+				&& (Spielfeld.spielfeldNachKoordinatenSuchen((zielFeld[1]+1), zielFeld[0], spielbrett).getFigur().getZugZaehler() == 1)				// Spielfigur hat einen Zug gemacht -> 2 Felder gezogen
+				&& ((zielFeld[1] == 2) && ((zielFeld[0] == startFeld[0]+1) || (zielFeld[0] == startFeld[0]-1)))	 ) {									// Zielfeld liegt diagonal vor Startfeld
+
+			spielzugZulaessig = true;
+			Spielfeld.spielfeldNachKoordinatenSuchen((zielFeld[1]+1), zielFeld[0], spielbrett).getFigur().setAktiv(false);
+			Spielfeld.spielfeldNachKoordinatenSuchen((zielFeld[1]+1), zielFeld[0], spielbrett).setFigur(schachFigurenSet[32]);
+			System.out.println("En passant!");
+		}
+
+		if ((team == 2) && (startFeld[1] == 4)
+				&& (Spielfeld.spielfeldNachKoordinatenSuchen((zielFeld[1]-1), zielFeld[0], spielbrett).getFigur().getTeam() == 1)					// Spielfigur auf dem Feld ist im gegnerischen Team
+				&& (Spielfeld.spielfeldNachKoordinatenSuchen((zielFeld[1]-1), zielFeld[0], spielbrett).getFigur().getBewegungsmuster() == 1)		// Spielfigur ist ein Bauer
+				&& (Spielfeld.spielfeldNachKoordinatenSuchen((zielFeld[1]-1), zielFeld[0], spielbrett).getFigur().getZugZaehler() == 1)				// Spielfigur hat einen Zug gemacht -> 2 Felder gezogen
+				&& ((zielFeld[1] == 5) && ((zielFeld[0] == startFeld[0]+1) || (zielFeld[0] == startFeld[0]-1)))	 ) {									// Zielfeld liegt diagonal vor Startfeld
+
+			spielzugZulaessig = true;
+			Spielfeld.spielfeldNachKoordinatenSuchen((zielFeld[1]-1), zielFeld[0], spielbrett).getFigur().setAktiv(false);
+			Spielfeld.spielfeldNachKoordinatenSuchen((zielFeld[1]-1), zielFeld[0], spielbrett).setFigur(schachFigurenSet[32]);
+			System.out.println("En passant!");
+		}
+
+		//Bauer zu einer gewaehlten Figur tauschen, wenn er die letzte Reihe erreicht (Spieler 1)
+		String gewaehlteFigur = "";
 		boolean figurGewaehlt=true;
 
-		while(figurGewaehlt && ( (zielFeld[1] == 7) && (figur.getTeam() ==2) || (zielFeld[1] == 0) && (figur.getTeam() ==1) ) ) {
+		if (spielzugZulaessig) {
 
-			if ((zielFeld[1] == 0) && (figur.getTeam() ==1)) {
-				System.out.println("Der Bauer hat die letzte Reihe erreicht, bitte waehlen sie eine Figur, durch die dieser Bauer ersetzt werden soll: (2 fuer Turm, 3 fuer Springer, 4 fuer Laeufer, 5 fuer Dame)");
-				gewaehlteFigur = input.nextInt();
+			while (figurGewaehlt && ((zielFeld[1] == 7) && (figur.getTeam() == 2) || (zielFeld[1] == 0) && (figur.getTeam() == 1))) {
 
-				switch (gewaehlteFigur) {
-					case 2:
-						figur.setBewegungsmuster(2);
-						figur.setAnzeigename("T-1");
-						figur.setName("Turm");
-						figurGewaehlt=false;
-						break;
-					case 3:
-						figur.setBewegungsmuster(3);
-						figur.setAnzeigename("S-1");
-						figur.setName("Springer");
-						figurGewaehlt=false;
-						break;
-					case 4:
-						figur.setBewegungsmuster(4);
-						figur.setAnzeigename("L-1");
-						figur.setName("Laeufer");
-						figurGewaehlt=false;
-						break;
-					case 5:
-						figur.setBewegungsmuster(5);
-						figur.setAnzeigename("D-1");
-						figur.setName("Dame");
-						figurGewaehlt=false;
-						break;
-					default:
-						System.out.println("ungueltige Eingabe.  Bitte geben sie eine Zahl von 2 bis 5 ein:");
+				if ((zielFeld[1] == 0) && (figur.getTeam() == 1)) {
+					System.out.println("Der Bauer hat die letzte Reihe erreicht, bitte waehlen sie eine Figur, durch die dieser Bauer ersetzt werden soll: (T fuer Turm, S fuer Springer, L fuer Laeufer, D fuer Dame)");
+					gewaehlteFigur = input.next();
+
+					switch (gewaehlteFigur) {
+						case "T":
+						case "t":
+							figur.setBewegungsmuster(2);
+							figur.setAnzeigename("T-1");
+							figur.setName("Turm");
+							figurGewaehlt = false;
+							break;
+						case "S":
+						case "s":
+							figur.setBewegungsmuster(3);
+							figur.setAnzeigename("S-1");
+							figur.setName("Springer");
+							figurGewaehlt = false;
+							break;
+						case "L":
+						case "l":
+							figur.setBewegungsmuster(4);
+							figur.setAnzeigename("L-1");
+							figur.setName("Laeufer");
+							figurGewaehlt = false;
+							break;
+						case "D":
+						case "d":
+							figur.setBewegungsmuster(5);
+							figur.setAnzeigename("D-1");
+							figur.setName("Dame");
+							figurGewaehlt = false;
+							break;
+						default:
+							System.out.println("ungueltige Eingabe.  Bitte geben sie eine Zahl von 2 bis 5 ein:");
+					}
 				}
 
-			}
+				//Bauer zu einer gewaehlten Figur tauschen, wenn er die letzte Reihe erreicht (Spieler 2)
+				if ((zielFeld[1] == 7) && (figur.getTeam() == 2)) {
+					System.out.println("Der Bauer hat die letzte Reihe erreicht, bitte waehlen sie eine Figur, durch die dieser Bauer ersetzt werden soll: (T fuer Turm, S fuer Springer, L fuer Laeufer, D fuer Dame)");
+					gewaehlteFigur = input.next();
 
-			if ((zielFeld[1] == 7) && (figur.getTeam() ==2)) {
-				System.out.println("Der Bauer hat die letzte Reihe erreicht, bitte waehlen sie eine Figur, durch die dieser Bauer ersetzt werden soll: (2 fuer Turm, 3 fuer Springer, 4 fuer Laeufer, 5 fuer Dame)");
-				gewaehlteFigur = input.nextInt();
+					switch (gewaehlteFigur) {
+						case "T":
+						case "t":
+							figur.setBewegungsmuster(2);
+							figur.setAnzeigename("T-2");
+							figur.setName("Turm");
+							figurGewaehlt = false;
+							break;
+						case "S":
+						case "s":
+							figur.setBewegungsmuster(3);
+							figur.setAnzeigename("S-2");
+							figur.setName("Springer");
+							figurGewaehlt = false;
+							break;
+						case "L":
+						case "l":
+							figur.setBewegungsmuster(4);
+							figur.setAnzeigename("L-2");
+							figur.setName("Laeufer");
+							figurGewaehlt = false;
+							break;
+						case "D":
+						case "d":
+							figur.setBewegungsmuster(5);
+							figur.setAnzeigename("D-2");
+							figur.setName("Dame");
+							figurGewaehlt = false;
+							break;
+						default:
+							System.out.println("ungueltige Eingabe.  Bitte geben sie eine Zahl von 2 bis 5 ein:");
+					}
 
-				switch (gewaehlteFigur) {
-					case 2:
-						figur.setBewegungsmuster(2);
-						figur.setAnzeigename("T-2");
-						figur.setName("Turm");
-						figurGewaehlt=false;
-						break;
-					case 3:
-						figur.setBewegungsmuster(3);
-						figur.setAnzeigename("S-2");
-						figur.setName("Springer");
-						figurGewaehlt=false;
-						break;
-					case 4:
-						figur.setBewegungsmuster(4);
-						figur.setAnzeigename("L-2");
-						figur.setName("Laeufer");
-						figurGewaehlt=false;
-						break;
-					case 5:
-						figur.setBewegungsmuster(5);
-						figur.setAnzeigename("D-2");
-						figur.setName("Dame");
-						figurGewaehlt=false;
-						break;
-					default:
-						System.out.println("ungueltige Eingabe.  Bitte geben sie eine Zahl von 2 bis 5 ein:");
 				}
 
 			}
 
 		}
-		
+
 		return spielzugZulaessig;		
 	}
 	
@@ -560,7 +605,7 @@ public class BewegungsMuster {
 		return spielzugZulaessig;		
 	}
 	
-	public static boolean bewegungKoenig(Figur figur, int[] startFeld, int[] zielFeld, Spielbrett spielbrett, int team) {			// Beliebige Richtung, aber nur 1 Feld
+	public static boolean bewegungKoenig(Figur figur, int[] startFeld, int[] zielFeld, Spielbrett spielbrett, int team, Figur[] schachFigurenSet) {			// Beliebige Richtung, aber nur 1 Feld
 		
 		boolean spielzugZulaessig = false;
 		
@@ -590,8 +635,69 @@ public class BewegungsMuster {
 			
 			||	 (((startFeld[0] - 1) == zielFeld[0]) 					
 				&&((startFeld[1] + 1) == zielFeld[1])) ) {
-			spielzugZulaessig=true;
-			}	
+			spielzugZulaessig = true;
+			}
+
+			//Rochade:
+
+			if (team == 1) {
+				if ( (figur.getZugZaehler() == 0) && (schachFigurenSet[8].getZugZaehler() == 0)																//Koenig und betroffener Turm wurden noch nicht bewegt
+					&& (!(Spielfeld.spielfeldNachKoordinatenSuchen(7, 1, spielbrett).getFigur().isAktiv()))							//Ueberpruefung der Felder zwischen Turm und Koenig
+					&& (!(Spielfeld.spielfeldNachKoordinatenSuchen(7, 2, spielbrett).getFigur().isAktiv()))
+					&& (!(Spielfeld.spielfeldNachKoordinatenSuchen(7, 3, spielbrett).getFigur().isAktiv())) ) {
+
+					if ((zielFeld[1] == 7) && (zielFeld[0] == 2)) {
+						spielzugZulaessig = true;
+						Spielfeld.spielfeldNachKoordinatenSuchen(7, 3, spielbrett).setFigur(schachFigurenSet[8]);						//Umsetzen des Turms (Koenig wird "normal" gesetzt)
+						Spielfeld.spielfeldNachKoordinatenSuchen(7, 0, spielbrett).setFigur(schachFigurenSet[32]);					//Ursprungsfeld des Turmes wird "leer" gesetzt (Platzhalter)
+						System.out.println("ROCHADE!");
+					}
+				}
+			}
+
+			if (team == 1) {
+				if ((figur.getZugZaehler() == 0) && (schachFigurenSet[9].getZugZaehler() == 0)																//Koenig und betroffener Turm wurden noch nicht bewegt
+						&& (!(Spielfeld.spielfeldNachKoordinatenSuchen(7, 5, spielbrett).getFigur().isAktiv()))						//Ueberpruefung der Felder zwischen Turm und Koenig
+						&& (!(Spielfeld.spielfeldNachKoordinatenSuchen(7, 6, spielbrett).getFigur().isAktiv())) ) {
+
+					if ((zielFeld[1] == 7) && (zielFeld[0] == 6)) {
+						spielzugZulaessig = true;
+						Spielfeld.spielfeldNachKoordinatenSuchen(7, 5, spielbrett).setFigur(schachFigurenSet[9]);						//Umsetzen des Turms (Koenig wird "normal" gesetzt)
+						Spielfeld.spielfeldNachKoordinatenSuchen(7, 7, spielbrett).setFigur(schachFigurenSet[32]);					//Ursprungsfeld des Turmes wird "leer" gesetzt (Platzhalter)
+						System.out.println("ROCHADE!");
+					}
+				}
+			}
+
+			if (team == 2) {
+				if ((figur.getZugZaehler() == 0) && (schachFigurenSet[24].getZugZaehler() == 0)																//Koenig und betroffener Turm wurden noch nicht bewegt
+						&& (!(Spielfeld.spielfeldNachKoordinatenSuchen(0, 1, spielbrett).getFigur().isAktiv()))						//Ueberpruefung der Felder zwischen Turm und Koenig
+						&& (!(Spielfeld.spielfeldNachKoordinatenSuchen(0, 2, spielbrett).getFigur().isAktiv()))
+						&& (!(Spielfeld.spielfeldNachKoordinatenSuchen(0, 3, spielbrett).getFigur().isAktiv())) ) {
+
+					if ((zielFeld[1] == 0) && (zielFeld[0] == 2)) {
+						spielzugZulaessig = true;
+						Spielfeld.spielfeldNachKoordinatenSuchen(0, 3, spielbrett).setFigur(schachFigurenSet[24]);					//Umsetzen des Turms (Koenig wird "normal" gesetzt)
+						Spielfeld.spielfeldNachKoordinatenSuchen(0, 0, spielbrett).setFigur(schachFigurenSet[32]);					//Ursprungsfeld des Turmes wird "leer" gesetzt (Platzhalter)
+						System.out.println("ROCHADE!");
+					}
+				}
+			}
+
+			if (team == 2) {
+				if ((figur.getZugZaehler() == 0) && (schachFigurenSet[25].getZugZaehler() == 0)																//Koenig und betroffener Turm wurden noch nicht bewegt
+						&& (!(Spielfeld.spielfeldNachKoordinatenSuchen(0, 5, spielbrett).getFigur().isAktiv()))						//Ueberpruefung der Felder zwischen Turm und Koenig
+						&& (!(Spielfeld.spielfeldNachKoordinatenSuchen(0, 6, spielbrett).getFigur().isAktiv())) ) {
+
+					if ((zielFeld[1] == 0) && (zielFeld[0] == 6)) {
+						spielzugZulaessig = true;
+						Spielfeld.spielfeldNachKoordinatenSuchen(0, 5, spielbrett).setFigur(schachFigurenSet[25]);					//Umsetzen des Turms (Koenig wird "normal" gesetzt)
+						Spielfeld.spielfeldNachKoordinatenSuchen(0, 7, spielbrett).setFigur(schachFigurenSet[32]);					//Ursprungsfeld des Turmes wird "leer" gesetzt (Platzhalter)
+						System.out.println("ROCHADE!");
+					}
+				}
+			}
+
 //		}
 
 		if (Spielfeld.spielfeldNachKoordinatenSuchen(zielFeld[1], zielFeld[0], spielbrett).getFigur().getTeam() == team) {
@@ -644,6 +750,10 @@ public class BewegungsMuster {
 			case 'H':
 				yKoordinate = 7;
 				break;
+			case 'q':
+			case 'Q':
+				yKoordinate =99;
+				break;
 			default:
 				yKoordinate = 9;                                                            // 9 = Fehleingabe
 
@@ -683,6 +793,10 @@ public class BewegungsMuster {
 				break;
 			case '8':
 				xKoordinate = 7;
+				break;
+			case 'q':
+			case 'Q':
+				xKoordinate =99;
 				break;
 			default:
 				xKoordinate = 9;                                                            // 9 = Fehleingabe

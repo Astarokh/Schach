@@ -68,7 +68,7 @@ public class Spielfeld {
 	public static Spielfeld[] SchachSpielfelderErstellen() {
 		
 		Spielfeld[] spielfeld = new Spielfeld[64];
-		Figur platzhalter = new Figur(0, false, "leer", 99, " ", 99);
+		Figur platzhalter = new Figur(0, false, "leer", 99, " ", 99, 99);
 		int zaehler1 = 0;
 		
 		for (int i = 0; i < 8; i++) {
@@ -102,7 +102,7 @@ public class Spielfeld {
 		schachbrett[14].setFigur(schachfiguren[22]);
 		schachbrett[15].setFigur(schachfiguren[23]);
 		
-		schachbrett[48].setFigur(schachfiguren[0]);						//untere Brettseite (wei�e Figuren / Spieler 1)
+		schachbrett[48].setFigur(schachfiguren[0]);						//untere Brettseite (weisse Figuren / Spieler 1)
 		schachbrett[49].setFigur(schachfiguren[1]);
 		schachbrett[50].setFigur(schachfiguren[2]);
 		schachbrett[51].setFigur(schachfiguren[3]);
